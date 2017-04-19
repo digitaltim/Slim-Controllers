@@ -1,6 +1,7 @@
 <?php
 
 use App\Controllers\HomeController;
+use App\Controllers\UserController;
 
 require 'vendor/autoload.php';
 
@@ -27,10 +28,15 @@ $container['view'] = function ($container) {
 };
 
 $container['db'] = function() {
-    return new PDO('pgsql:host=localhost;port=5432;dbname=forum', 'user=postgres', 'password=password');
+    return new PDO('pgsql:host=localhost;port=5432;dbname=forum', 'postgres', 'password');
 };
 
 $app->get('/', HomeController::class . ':index');
+
+$app->group('/users', function() {
+    $this->get('', UserController::class . ':index');
+    $this->get('/{id}', UserController::class . ':show');
+});
 
 $app->get('/home', function($request, $response) {
 	return $this->view->render($response, 'home.twig');
