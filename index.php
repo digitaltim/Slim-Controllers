@@ -26,6 +26,10 @@ $container['view'] = function ($container) {
     return $view;
 };
 
+$container['db'] = function() {
+    return new PDO('pgsql:host=localhost;port=5432;dbname=forum', 'user=postgres', 'password=password');
+};
+
 $app->get('/', HomeController::class . ':index');
 
 $app->get('/home', function($request, $response) {
