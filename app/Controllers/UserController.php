@@ -36,7 +36,7 @@ class UserController extends Controller
 				'password' => $request->getParam('password')
 			]);
 		} catch (PDOException $e) {
-			return $response->withStatus(404)->write(json_encode([
+			return $response->withStatus(500)->write(json_encode([
 				'error' => 'Could not store user.'
 			]));
 		}
@@ -45,31 +45,42 @@ class UserController extends Controller
 	}
 
 	public function update($request, $response, $args)
-	{
-		// $params = $request->getParams();
-
-		// $sqlParams = implode(', ', array_map(function ($column) {
-		// 	return $column . ' = :' . $column;
-		// }, array_keys($params)));
-
-		// $statement = $this->c->db->prepare("UPDATE users SET $sqlParams WHERE id = :id");
-		
+	{		
 		$statement = $this->c->db->prepare("UPDATE users SET name = :name, email = :email WHERE id = :id");
 
 		try {
-			// $statement->execute(array_merge($params, ['id' => $args['id']]));
 			$statement->execute([
 				'name' => $request->getParam('name'),
 				'email' => $request->getParam('email'),
 				'id' => $args['id']
 			]);
 		} catch (PDOException $e) {
-			return $response->withStatus(404)->write(json_encode([
+			return $response->withStatus(500)->write(json_encode([
 				'error' => 'Could not update user.'
 			]));
 		}
 
 		return $response->withJson($this->getUserById($args['id']));
+	}
+
+	public function destroy($request, $response, $args)
+	{	
+		if ($this->getUserById($args['id']) === null) {
+			return $response->withStatus(404)->write(json_encode([
+				'error' => 'User does not exist.'
+			]));
+		}
+		$statement = $this->c->db->prepare("DELETE FROM users WHERE id = :id");
+
+		try {
+			$statement->execute(['id' => $args['id']]);
+		} catch (PDOException $e) {
+			return $response->withStatus(500)->write(json_encode([
+				'error' => 'Could not delete user.'
+			]));
+		}
+
+		return $response->withStatus(204);
 	}
 
 	protected function getUserById($id)

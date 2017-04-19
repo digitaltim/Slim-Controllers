@@ -41,6 +41,7 @@ $app->group('/users', function() {
     $this->get('/{id}', UserController::class . ':show');
     $this->post('', UserController::class . ':store');
     $this->map(['PUT', 'PATCH'], '/{id}', UserController::class . ':update');
+    $this->delete('/{id}', UserController::class . ':destroy');
 });
 
 $app->get('/home', function($request, $response) {
