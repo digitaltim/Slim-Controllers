@@ -28,7 +28,10 @@ $container['view'] = function ($container) {
 };
 
 $container['db'] = function() {
-    return new PDO('pgsql:host=localhost;port=5432;dbname=forum', 'postgres', 'password');
+    $db = new PDO('pgsql:host=localhost;port=5432;dbname=forum', 'postgres', 'password');
+    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+    return $db;
 };
 
 $app->get('/', HomeController::class . ':index');
@@ -36,6 +39,7 @@ $app->get('/', HomeController::class . ':index');
 $app->group('/users', function() {
     $this->get('', UserController::class . ':index');
     $this->get('/{id}', UserController::class . ':show');
+    $this->post('', UserController::class . ':store');
 });
 
 $app->get('/home', function($request, $response) {
