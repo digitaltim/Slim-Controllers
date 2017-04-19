@@ -44,6 +44,34 @@ class UserController extends Controller
 		return $response->withJson($this->getUserById($this->c->db->lastInsertId()));
 	}
 
+	public function update($request, $response, $args)
+	{
+		// $params = $request->getParams();
+
+		// $sqlParams = implode(', ', array_map(function ($column) {
+		// 	return $column . ' = :' . $column;
+		// }, array_keys($params)));
+
+		// $statement = $this->c->db->prepare("UPDATE users SET $sqlParams WHERE id = :id");
+		
+		$statement = $this->c->db->prepare("UPDATE users SET name = :name, email = :email WHERE id = :id");
+
+		try {
+			// $statement->execute(array_merge($params, ['id' => $args['id']]));
+			$statement->execute([
+				'name' => $request->getParam('name'),
+				'email' => $request->getParam('email'),
+				'id' => $args['id']
+			]);
+		} catch (PDOException $e) {
+			return $response->withStatus(404)->write(json_encode([
+				'error' => 'Could not update user.'
+			]));
+		}
+
+		return $response->withJson($this->getUserById($args['id']));
+	}
+
 	protected function getUserById($id)
 	{
 		$statement = $this->c->db->prepare("SELECT * FROM users WHERE id = :id");

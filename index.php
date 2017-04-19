@@ -40,6 +40,7 @@ $app->group('/users', function() {
     $this->get('', UserController::class . ':index');
     $this->get('/{id}', UserController::class . ':show');
     $this->post('', UserController::class . ':store');
+    $this->map(['PUT', 'PATCH'], '/{id}', UserController::class . ':update');
 });
 
 $app->get('/home', function($request, $response) {
